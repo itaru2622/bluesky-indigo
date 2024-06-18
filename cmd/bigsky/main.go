@@ -155,6 +155,12 @@ func run(args []string) {
 			Value:   100,
 			EnvVars: []string{"MAX_FETCH_CONCURRENCY"},
 		},
+		&cli.Int64Flag{
+			Name:    "newpds-perday-limit",
+			Value:   10,
+			EnvVars: []string{"BGS_NEWPDS_PERDAY_LIMIT"},
+			Usage:   "initial value for NewPDSPerDayLimit",
+		},
 	}
 
 	app.Action = Bigsky
@@ -349,7 +355,7 @@ func Bigsky(cctx *cli.Context) error {
 	}
 
 	log.Infow("constructing bgs")
-	bgs, err := libbgs.NewBGS(db, ix, repoman, evtman, cachedidr, rf, hr, !cctx.Bool("crawl-insecure-ws"), cctx.Duration("compact-interval"))
+	bgs, err := libbgs.NewBGS(db, ix, repoman, evtman, cachedidr, rf, hr, !cctx.Bool("crawl-insecure-ws"), cctx.Duration("compact-interval"), cctx.Int64("newpds-perday-limit"))
 	if err != nil {
 		return err
 	}

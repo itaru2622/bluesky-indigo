@@ -106,7 +106,7 @@ type SocketConsumer struct {
 	EventsSent  promclient.Counter
 }
 
-func NewBGS(db *gorm.DB, ix *indexer.Indexer, repoman *repomgr.RepoManager, evtman *events.EventManager, didr did.Resolver, rf *indexer.RepoFetcher, hr api.HandleResolver, ssl bool, compactInterval time.Duration) (*BGS, error) {
+func NewBGS(db *gorm.DB, ix *indexer.Indexer, repoman *repomgr.RepoManager, evtman *events.EventManager, didr did.Resolver, rf *indexer.RepoFetcher, hr api.HandleResolver, ssl bool, compactInterval time.Duration, initialNewPDSPerDayLimit int64) (*BGS, error) {
 	db.AutoMigrate(User{})
 	db.AutoMigrate(AuthToken{})
 	db.AutoMigrate(models.PDS{})
@@ -132,6 +132,7 @@ func NewBGS(db *gorm.DB, ix *indexer.Indexer, repoman *repomgr.RepoManager, evtm
 	ix.CreateExternalUser = bgs.createExternalUser
 	slOpts := DefaultSlurperOptions()
 	slOpts.SSL = ssl
+	slOpts.DefaultNewPDSPerDayLimit = initialNewPDSPerDayLimit
 	s, err := NewSlurper(db, bgs.handleFedEvent, slOpts)
 	if err != nil {
 		return nil, err
